@@ -13,17 +13,8 @@ class MockAuth {
 
   onAuthStateChanged(callback) {
     this.authStateListeners.push(callback);
-    // Simulate logged in user in development
-    setTimeout(() => {
-      this.currentUser = {
-        uid: 'mock-admin-id',
-        email: 'admin@example.com',
-        displayName: 'GSFP Administrator',
-        emailVerified: true,
-        photoURL: null
-      };
-      callback(this.currentUser);
-    }, 1000);
+    // Don't auto-login - let user login through the login page
+    callback(this.currentUser);
     return () => {
       this.authStateListeners = this.authStateListeners.filter(cb => cb !== callback);
     };
