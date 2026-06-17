@@ -21,6 +21,24 @@ class MockAuth {
   }
 
   async signInWithEmailAndPassword(email, password) {
+    // Predefined test credentials
+    const testCredentials = [
+      { email: 'admin@example.com', password: 'admin123' },
+      { email: 'test@gsfp.gov.gh', password: 'test123' },
+      { email: 'demo@example.com', password: 'demo123' }
+    ];
+
+    // Check if credentials match any test account (case-insensitive email)
+    const isValidTest = testCredentials.some(
+      cred => cred.email.toLowerCase() === email.toLowerCase() && cred.password === password
+    );
+
+    // For development, also accept any credentials if no test credentials match
+    // This allows flexibility while providing specific test accounts
+    if (!isValidTest && email && password) {
+      console.log('Using generic mock login for development');
+    }
+
     // Mock successful login
     this.currentUser = {
       uid: 'mock-admin-id',
