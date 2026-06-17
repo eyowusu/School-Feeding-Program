@@ -29,7 +29,10 @@ class MockAuth {
       emailVerified: true,
       photoURL: null
     };
-    this.authStateListeners.forEach(cb => cb(this.currentUser));
+    // Trigger auth state change after a small delay to simulate async behavior
+    setTimeout(() => {
+      this.authStateListeners.forEach(cb => cb(this.currentUser));
+    }, 100);
     return { user: this.currentUser };
   }
 
