@@ -17,7 +17,7 @@ class MockAuth {
     setTimeout(() => {
       this.currentUser = {
         uid: 'mock-admin-id',
-        email: 'admin@gsfp.gov.gh',
+        email: 'admin@example.com',
         displayName: 'GSFP Administrator',
         emailVerified: true,
         photoURL: null

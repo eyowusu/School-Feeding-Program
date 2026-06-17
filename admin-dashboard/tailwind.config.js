@@ -34,6 +34,45 @@ module.exports = {
             800: '#065f46',  // Darker green
             900: '#064e3b',  // Very dark green
           },
+          // Gold Colors - Ghana Flag Inspired Gold
+          'gold': {
+            50: '#fefce8',   // Very light gold
+            100: '#fef9c3',  // Light gold
+            200: '#fef08a',  // Lighter gold
+            300: '#fde047',  // Light medium gold
+            400: '#facc15',  // Medium light gold
+            500: '#eab308',  // Medium gold
+            600: '#ca8a04',  // GSFP Gold (text/highlights)
+            700: '#a16207',  // Dark gold
+            800: '#854d0e',  // Darker gold
+            900: '#713f12',  // Very dark gold
+          },
+          // Warning Colors - Amber/Orange for warnings
+          'warning': {
+            50: '#fffbeb',   // Very light amber
+            100: '#fef3c7',  // Light amber
+            200: '#fde68a',  // Lighter amber
+            300: '#fcd34d',  // Light medium amber
+            400: '#fbbf24',  // Medium light amber
+            500: '#f59e0b',  // Medium amber
+            600: '#d97706',  // GSFP Warning (warnings/alerts)
+            700: '#b45309',  // Dark amber
+            800: '#92400e',  // Darker amber
+            900: '#78350f',  // Very dark amber
+          },
+          // Error Colors - Red for errors
+          'error': {
+            50: '#fef2f2',   // Very light red
+            100: '#fee2e2',  // Light red
+            200: '#fecaca',  // Lighter red
+            300: '#fca5a5',  // Light medium red
+            400: '#f87171',  // Medium light red
+            500: '#ef4444',  // Medium red
+            600: '#dc2626',  // GSFP Error (errors/danger)
+            700: '#b91c1c',  // Dark red
+            800: '#991b1b',  // Darker red
+            900: '#7f1d1d',  // Very dark red
+          },
           // Neutral Colors - Professional Grays
           'neutral': {
             50: '#f8fafc',   // Very light gray

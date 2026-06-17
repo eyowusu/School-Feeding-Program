@@ -30,10 +30,6 @@ import {
   writeBatch
 } from 'firebase/firestore';
 import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
   getStorage
 } from 'firebase/storage';
 
@@ -47,20 +43,20 @@ function initializeFirebase() {
     // Ensure config manager is initialized first
     const config = configManager.initialize();
     const firebaseConfig = configManager.getFirebaseConfig();
+    const envSettings = configManager.getEnvironmentSettings();
     
-    if (config.isDevelopment || !firebaseConfig.apiKey) {
-      // Use mock Firebase for local development and when Firebase credentials are not provided
+    // Only use mock Firebase if explicitly enabled in development
+    if (config.isDevelopment && envSettings.enableMockData) {
       auth = MockFirebase.auth;
       db = MockFirebase.db;
       storage = MockFirebase.storage;
       app = MockFirebase.app;
-      console.log('Using Mock Firebase services (Admin)');
+      console.log('Using Mock Firebase services (Admin - Development Mode)');
+    } else if (!firebaseConfig.apiKey) {
+      throw new Error('Firebase configuration is required. Please set REACT_APP_FIREBASE_* environment variables.');
     } else {
-      // Real Firebase for production when credentials are provided
-      // Initialize Firebase
+      // Real Firebase for production or when credentials are provided
       app = initializeApp(firebaseConfig);
-
-      // Initialize services
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
@@ -68,13 +64,8 @@ function initializeFirebase() {
     }
     isInitialized = true;
   } catch (error) {
-    console.warn('Firebase not initialized yet, using mock services:', error);
-    // Fallback to mock services
-    auth = MockFirebase.auth;
-    db = MockFirebase.db;
-    storage = MockFirebase.storage;
-    app = MockFirebase.app;
-    isInitialized = true;
+    console.error('Firebase initialization failed:', error);
+    throw error; // Don't silently fall back to mocks in production
   }
 }
 

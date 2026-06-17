@@ -15,10 +15,10 @@ import { analyticsService, AnalyticsData } from '../services/analyticsService';
 // Helper function to get device colors
 const getDeviceColor = (device: string): string => {
   switch (device) {
-    case 'Desktop': return 'bg-blue-500';
-    case 'Mobile': return 'bg-green-500';
-    case 'Tablet': return 'bg-yellow-500';
-    default: return 'bg-gray-500';
+    case 'Desktop': return 'bg-ghana-primary-500';
+    case 'Mobile': return 'bg-ghana-secondary-500';
+    case 'Tablet': return 'bg-ghana-warning-500';
+    default: return 'bg-ghana-neutral-500';
   }
 };
 
@@ -110,7 +110,7 @@ const Analytics = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+          <h1 className="text-xl font-bold text-gray-900">Analytics Dashboard</h1>
           <p className="text-gray-600">Track website performance and user engagement</p>
           <div className="flex items-center gap-2 mt-2">
             {isRealTime && (
@@ -155,8 +155,8 @@ const Analytics = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Eye className="h-6 w-6 text-blue-600" />
+            <div className="p-2 bg-ghana-primary-100 rounded-lg">
+              <Eye className="h-6 w-6 text-ghana-primary-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Views</p>
@@ -170,8 +170,8 @@ const Analytics = () => {
 
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Users className="h-6 w-6 text-green-600" />
+            <div className="p-2 bg-ghana-secondary-100 rounded-lg">
+              <Users className="h-6 w-6 text-ghana-secondary-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Unique Visitors</p>
@@ -185,8 +185,8 @@ const Analytics = () => {
 
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="h-6 w-6 text-yellow-600" />
+            <div className="p-2 bg-ghana-warning-100 rounded-lg">
+              <Clock className="h-6 w-6 text-ghana-warning-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Avg. Session</p>
@@ -200,8 +200,8 @@ const Analytics = () => {
 
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <TrendingUp className="h-6 w-6 text-red-600" />
+            <div className="p-2 bg-ghana-error-100 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-ghana-error-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Bounce Rate</p>
@@ -228,7 +228,7 @@ const Analytics = () => {
                   <div className="ml-4 flex-1">
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
+                        className="bg-ghana-primary-600 h-2 rounded-full"
                         style={{ width: `${page.percentage}%` }}
                       ></div>
                     </div>

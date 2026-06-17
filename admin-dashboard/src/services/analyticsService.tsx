@@ -196,240 +196,300 @@ class AnalyticsService {
    * Get page views data
    */
   private async getPageViewsData(startDate: Date, endDate: Date): Promise<PageAnalytics[]> {
-    try {
-      const { db } = getFirebaseServices();
-      const analyticsRef = collection(db, 'analytics');
-      const q = query(
-        analyticsRef,
-        where('type', '==', 'page_view'),
-        where('timestamp', '>=', Timestamp.fromDate(startDate)),
-        where('timestamp', '<=', Timestamp.fromDate(endDate)),
-        orderBy('timestamp', 'desc')
-      );
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    const q = query(
+      analyticsRef,
+      where('type', '==', 'page_view'),
+      where('timestamp', '>=', Timestamp.fromDate(startDate)),
+      where('timestamp', '<=', Timestamp.fromDate(endDate)),
+      orderBy('timestamp', 'desc')
+    );
 
-      const querySnapshot = await getDocs(q);
-      const pageViews: Record<string, number> = {};
+    const querySnapshot = await getDocs(q);
+    const pageViews: Record<string, number> = {};
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const page = data.page || 'unknown';
-        pageViews[page] = (pageViews[page] || 0) + 1;
-      });
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const page = data.page || 'unknown';
+      pageViews[page] = (pageViews[page] || 0) + 1;
+    });
 
-      const totalViews = Object.values(pageViews).reduce((sum, count) => sum + count, 0);
-      
-      return Object.entries(pageViews)
-        .map(([page, views]) => ({
-          page,
-          views,
-          percentage: totalViews > 0 ? Math.round((views / totalViews) * 100) : 0
-        }))
-        .sort((a, b) => b.views - a.views)
-        .slice(0, 10);
-    } catch (error) {
-      console.error('Error getting page views data:', error);
-      return this.getDefaultPageData();
+    const totalViews = Object.values(pageViews).reduce((sum, count) => sum + count, 0);
+    
+    if (totalViews === 0) {
+      console.warn('No page views data found for the selected time range');
+      return [];
     }
+    
+    return Object.entries(pageViews)
+      .map(([page, views]) => ({
+        page,
+        views,
+        percentage: totalViews > 0 ? Math.round((views / totalViews) * 100) : 0
+      }))
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 10);
   }
 
   /**
    * Get device analytics
    */
   private async getDeviceAnalytics(startDate: Date, endDate: Date): Promise<DeviceAnalytics[]> {
-    try {
-      const { db } = getFirebaseServices();
-      const analyticsRef = collection(db, 'analytics');
-      const q = query(
-        analyticsRef,
-        where('type', '==', 'page_view'),
-        where('timestamp', '>=', Timestamp.fromDate(startDate)),
-        where('timestamp', '<=', Timestamp.fromDate(endDate))
-      );
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    const q = query(
+      analyticsRef,
+      where('type', '==', 'page_view'),
+      where('timestamp', '>=', Timestamp.fromDate(startDate)),
+      where('timestamp', '<=', Timestamp.fromDate(endDate))
+    );
 
-      const querySnapshot = await getDocs(q);
-      const deviceCounts: Record<string, number> = {};
+    const querySnapshot = await getDocs(q);
+    const deviceCounts: Record<string, number> = {};
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const userAgent = data.userAgent || '';
-        const device = this.detectDevice(userAgent);
-        deviceCounts[device] = (deviceCounts[device] || 0) + 1;
-      });
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const userAgent = data.userAgent || '';
+      const device = this.detectDevice(userAgent);
+      deviceCounts[device] = (deviceCounts[device] || 0) + 1;
+    });
 
-      const totalDevices = Object.values(deviceCounts).reduce((sum, count) => sum + count, 0);
-      
-      return Object.entries(deviceCounts)
-        .map(([device, count]) => ({
-          device,
-          percentage: totalDevices > 0 ? Math.round((count / totalDevices) * 100) : 0,
-          users: count,
-          sessions: count
-        }))
-        .sort((a, b) => b.percentage - a.percentage);
-    } catch (error) {
-      console.error('Error getting device analytics:', error);
-      return this.getDefaultDeviceData();
+    const totalDevices = Object.values(deviceCounts).reduce((sum, count) => sum + count, 0);
+    
+    if (totalDevices === 0) {
+      console.warn('No device analytics data found for the selected time range');
+      return [];
     }
+    
+    return Object.entries(deviceCounts)
+      .map(([device, count]) => ({
+        device,
+        percentage: totalDevices > 0 ? Math.round((count / totalDevices) * 100) : 0,
+        users: count,
+        sessions: count
+      }))
+      .sort((a, b) => b.percentage - a.percentage);
   }
 
   /**
    * Get traffic sources
    */
   private async getTrafficSources(startDate: Date, endDate: Date): Promise<TrafficSourceAnalytics[]> {
-    try {
-      const { db } = getFirebaseServices();
-      const analyticsRef = collection(db, 'analytics');
-      const q = query(
-        analyticsRef,
-        where('type', '==', 'page_view'),
-        where('timestamp', '>=', Timestamp.fromDate(startDate)),
-        where('timestamp', '<=', Timestamp.fromDate(endDate))
-      );
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    const q = query(
+      analyticsRef,
+      where('type', '==', 'page_view'),
+      where('timestamp', '>=', Timestamp.fromDate(startDate)),
+      where('timestamp', '<=', Timestamp.fromDate(endDate))
+    );
 
-      const querySnapshot = await getDocs(q);
-      const sourceCounts: Record<string, number> = {};
+    const querySnapshot = await getDocs(q);
+    const sourceCounts: Record<string, number> = {};
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const referrer = data.referrer || '';
-        const source = this.detectTrafficSource(referrer);
-        sourceCounts[source] = (sourceCounts[source] || 0) + 1;
-      });
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const referrer = data.referrer || '';
+      const source = this.detectTrafficSource(referrer);
+      sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+    });
 
-      const totalSources = Object.values(sourceCounts).reduce((sum, count) => sum + count, 0);
-      
-      return Object.entries(sourceCounts)
-        .map(([source, visitors]) => ({
-          source,
-          visitors,
-          percentage: totalSources > 0 ? Math.round((visitors / totalSources) * 100) : 0,
-          conversionRate: Math.random() * 5 // Mock conversion rate
+    const totalSources = Object.values(sourceCounts).reduce((sum, count) => sum + count, 0);
+    
+    if (totalSources === 0) {
+      console.warn('No traffic source data found for the selected time range');
+      return [];
+    }
+    
+    return Object.entries(sourceCounts)
+      .map(([source, visitors]) => ({
+        source,
+        visitors,
+        percentage: totalSources > 0 ? Math.round((visitors / totalSources) * 100) : 0,
+          conversionRate: 0 // Conversion rate would be calculated from actual conversion data
         }))
         .sort((a, b) => b.visitors - a.visitors);
-    } catch (error) {
-      console.error('Error getting traffic sources:', error);
-      return this.getDefaultTrafficData();
-    }
   }
 
   /**
    * Get recent activity
    */
   private async getRecentActivity(): Promise<ActivityItem[]> {
-    try {
-      // Get recent content changes
-      const { db } = getFirebaseServices();
-      const contentRef = collection(db, 'content');
-      const contentQuery = query(
-        contentRef,
-        orderBy('updatedAt', 'desc'),
-        limit(10)
-      );
-      
-      const contentSnapshot = await getDocs(contentQuery);
-      const activities: ActivityItem[] = [];
+    const { db } = getFirebaseServices();
+    const contentRef = collection(db, 'content');
+    const contentQuery = query(
+      contentRef,
+      orderBy('updatedAt', 'desc'),
+      limit(10)
+    );
+    
+    const contentSnapshot = await getDocs(contentQuery);
+    const activities: ActivityItem[] = [];
 
-      contentSnapshot.forEach((doc) => {
-        const data = doc.data();
-        activities.push({
-          id: doc.id,
-          action: this.getActionFromStatus(data.status),
-          item: data.title || 'Untitled Content',
-          user: data.updatedBy || 'Unknown',
-          time: this.formatRelativeTime(data.updatedAt?.toDate()),
-          type: data.type || 'content',
-          metadata: { status: data.status }
-        });
+    contentSnapshot.forEach((doc) => {
+      const data = doc.data();
+      activities.push({
+        id: doc.id,
+        action: this.getActionFromStatus(data.status),
+        item: data.title || 'Untitled Content',
+        user: data.updatedBy || 'Unknown',
+        time: this.formatRelativeTime(data.updatedAt?.toDate()),
+        type: data.type || 'content',
+        metadata: { status: data.status }
       });
+    });
 
-      return activities;
-    } catch (error) {
-      console.error('Error getting recent activity:', error);
-      return this.getDefaultActivityData();
-    }
+    return activities;
   }
 
   /**
    * Get real-time users
    */
   private async getRealTimeUsers(): Promise<number> {
-    try {
-      // In a real implementation, this would query a real-time users collection
-      // For now, return a mock value
-      return Math.floor(Math.random() * 100) + 50;
-    } catch (error) {
-      console.error('Error getting real-time users:', error);
-      return 0;
-    }
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    
+    const q = query(
+      analyticsRef,
+      where('type', '==', 'page_view'),
+      where('timestamp', '>=', Timestamp.fromDate(fiveMinutesAgo))
+    );
+    
+    const snapshot = await getDocs(q);
+    const uniqueUsers = new Set<string>();
+    
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      uniqueUsers.add(data.userId || 'anonymous');
+    });
+    
+    return uniqueUsers.size;
   }
 
   /**
    * Get unique visitors
    */
   private async getUniqueVisitors(startDate: Date, endDate: Date): Promise<number> {
-    try {
-      const { db } = getFirebaseServices();
-      const analyticsRef = collection(db, 'analytics');
-      const q = query(
-        analyticsRef,
-        where('type', '==', 'page_view'),
-        where('timestamp', '>=', Timestamp.fromDate(startDate)),
-        where('timestamp', '<=', Timestamp.fromDate(endDate))
-      );
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    const q = query(
+      analyticsRef,
+      where('type', '==', 'page_view'),
+      where('timestamp', '>=', Timestamp.fromDate(startDate)),
+      where('timestamp', '<=', Timestamp.fromDate(endDate))
+    );
 
-      const querySnapshot = await getDocs(q);
-      const uniqueUsers = new Set<string>();
+    const querySnapshot = await getDocs(q);
+    const uniqueUsers = new Set<string>();
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        uniqueUsers.add(data.userId || 'anonymous');
-      });
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      uniqueUsers.add(data.userId || 'anonymous');
+    });
 
-      return uniqueUsers.size;
-    } catch (error) {
-      console.error('Error getting unique visitors:', error);
-      return 89000; // Fallback value
-    }
+    return uniqueUsers.size;
   }
 
   /**
    * Get average session duration
    */
   private async getAvgSessionDuration(startDate: Date, endDate: Date): Promise<string> {
-    try {
-      // Mock implementation - in reality, this would calculate from session data
-      const durations = ['2:45', '3:12', '2:58', '3:24', '2:39'];
-      return durations[Math.floor(Math.random() * durations.length)];
-    } catch (error) {
-      console.error('Error getting avg session duration:', error);
-      return '3:24';
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    const q = query(
+      analyticsRef,
+      where('type', '==', 'session_start'),
+      where('timestamp', '>=', Timestamp.fromDate(startDate)),
+      where('timestamp', '<=', Timestamp.fromDate(endDate))
+    );
+    
+    const snapshot = await getDocs(q);
+    const sessionDurations: number[] = [];
+    
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.duration) {
+        sessionDurations.push(data.duration);
+      }
+    });
+    
+    if (sessionDurations.length === 0) {
+      return '0:00';
     }
+    
+    const avgDuration = sessionDurations.reduce((sum, duration) => sum + duration, 0) / sessionDurations.length;
+    const minutes = Math.floor(avgDuration / 60);
+    const seconds = Math.floor(avgDuration % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
   /**
    * Get bounce rate
    */
   private async getBounceRate(startDate: Date, endDate: Date): Promise<number> {
-    try {
-      // Mock implementation - in reality, this would calculate from session data
-      return Math.random() * 20 + 30; // 30-50% range
-    } catch (error) {
-      console.error('Error getting bounce rate:', error);
-      return 34.5;
-    }
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    
+    // Get total sessions
+    const sessionsQuery = query(
+      analyticsRef,
+      where('type', '==', 'session_start'),
+      where('timestamp', '>=', Timestamp.fromDate(startDate)),
+      where('timestamp', '<=', Timestamp.fromDate(endDate))
+    );
+    const sessionsSnapshot = await getDocs(sessionsQuery);
+    const totalSessions = sessionsSnapshot.size;
+    
+    if (totalSessions === 0) return 0;
+    
+    // Get bounced sessions (sessions with only 1 page view)
+    const bouncedQuery = query(
+      analyticsRef,
+      where('type', '==', 'session_end'),
+      where('pageViews', '==', 1),
+      where('timestamp', '>=', Timestamp.fromDate(startDate)),
+      where('timestamp', '<=', Timestamp.fromDate(endDate))
+    );
+    const bouncedSnapshot = await getDocs(bouncedQuery);
+    const bouncedSessions = bouncedSnapshot.size;
+    
+    return (bouncedSessions / totalSessions) * 100;
   }
 
   /**
    * Get monthly growth
    */
   private async getMonthlyGrowth(): Promise<number> {
-    try {
-      // Mock implementation - compare current month with previous month
-      return Math.random() * 20 + 5; // 5-25% growth
-    } catch (error) {
-      console.error('Error getting monthly growth:', error);
-      return 12.5;
-    }
+    const { db } = getFirebaseServices();
+    const analyticsRef = collection(db, 'analytics');
+    
+    const now = new Date();
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    
+    const thisMonthQuery = query(
+      analyticsRef,
+      where('type', '==', 'page_view'),
+      where('timestamp', '>=', Timestamp.fromDate(thisMonthStart))
+    );
+    const thisMonthSnapshot = await getDocs(thisMonthQuery);
+    const thisMonthViews = thisMonthSnapshot.size;
+    
+    const lastMonthQuery = query(
+      analyticsRef,
+      where('type', '==', 'page_view'),
+      where('timestamp', '>=', Timestamp.fromDate(lastMonthStart)),
+      where('timestamp', '<=', Timestamp.fromDate(lastMonthEnd))
+    );
+    const lastMonthSnapshot = await getDocs(lastMonthQuery);
+    const lastMonthViews = lastMonthSnapshot.size;
+    
+    if (lastMonthViews === 0) return 0;
+    
+    return ((thisMonthViews - lastMonthViews) / lastMonthViews) * 100;
   }
 
   /**
@@ -498,63 +558,6 @@ class AnalyticsService {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  // Default data fallbacks
-  private getDefaultPageData(): PageAnalytics[] {
-    return [
-      { page: '/home', views: 45000, percentage: 36 },
-      { page: '/about', views: 28000, percentage: 22 },
-      { page: '/news', views: 18000, percentage: 14 },
-      { page: '/gallery', views: 12000, percentage: 10 },
-      { page: '/contact', views: 8000, percentage: 6 }
-    ];
-  }
-
-  private getDefaultDeviceData(): DeviceAnalytics[] {
-    return [
-      { device: 'Desktop', percentage: 45, users: 45000, sessions: 45000 },
-      { device: 'Mobile', percentage: 40, users: 40000, sessions: 40000 },
-      { device: 'Tablet', percentage: 15, users: 15000, sessions: 15000 }
-    ];
-  }
-
-  private getDefaultTrafficData(): TrafficSourceAnalytics[] {
-    return [
-      { source: 'Direct', visitors: 35000, percentage: 39, conversionRate: 3.2 },
-      { source: 'Search Engines', visitors: 28000, percentage: 31, conversionRate: 4.1 },
-      { source: 'Social Media', visitors: 18000, percentage: 20, conversionRate: 2.8 },
-      { source: 'Referrals', visitors: 7000, percentage: 8, conversionRate: 5.2 },
-      { source: 'Email', visitors: 2000, percentage: 2, conversionRate: 6.1 }
-    ];
-  }
-
-  private getDefaultActivityData(): ActivityItem[] {
-    return [
-      {
-        id: '1',
-        action: 'New article published',
-        item: 'School Feeding Impact Report 2024',
-        user: 'Admin',
-        time: '2 hours ago',
-        type: 'content'
-      },
-      {
-        id: '2',
-        action: 'Images uploaded',
-        item: 'Community Outreach Photos',
-        user: 'Editor',
-        time: '4 hours ago',
-        type: 'media'
-      },
-      {
-        id: '3',
-        action: 'Event created',
-        item: 'Nutrition Education Workshop',
-        user: 'Coordinator',
-        time: '1 day ago',
-        type: 'event'
-      }
-    ];
-  }
 
   /**
    * Cleanup all listeners

@@ -6,6 +6,15 @@ const Partners = () => {
   const partners = [
     {
       id: 1,
+      name: "Ministry of Gender, Children and Social Protection",
+      logo: "/coat1.jpg",
+      type: "Government Partner",
+      description: "Ensuring child protection and social welfare in school feeding programs.",
+      website: "https://www.mogcsp.gov.gh/",
+      category: "government"
+    },
+    {
+      id: 2,
       name: "World Food Programme",
       logo: "/wfp-logo.svg",
       type: "International Partner",
@@ -14,7 +23,7 @@ const Partners = () => {
       category: "international"
     },
     {
-      id: 2,
+      id: 3,
       name: "Ghana Education Service",
       logo: "/coat1.jpg",
       type: "Government Partner",
@@ -23,7 +32,7 @@ const Partners = () => {
       category: "government"
     },
     {
-      id: 3,
+      id: 4,
       name: "UNICEF Ghana",
       logo: "/unicef-logo.svg",
       type: "UN Agency",
@@ -32,21 +41,12 @@ const Partners = () => {
       category: "international"
     },
     {
-      id: 4,
+      id: 5,
       name: "Ghana Health Service",
       logo: "/coat1.jpg",
       type: "Government Partner",
       description: "Providing nutritional guidelines and health monitoring for school children.",
       website: "https://ghs.gov.gh/",
-      category: "government"
-    },
-    {
-      id: 5,
-      name: "Ministry of Gender, Children and Social Protection",
-      logo: "/coat1.jpg",
-      type: "Government Partner",
-      description: "Ensuring child protection and social welfare in school feeding programs.",
-      website: "https://www.mogcsp.gov.gh/",
       category: "government"
     },
     {

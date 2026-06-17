@@ -47,7 +47,7 @@ const users = [
   {
     id: 'mock-user-id',
     name: 'Administrator',
-    email: 'admin@gsfp.gov.gh',
+    email: 'admin@example.com',
     role: 'admin',
     createdAt: serverTimestamp(),
     lastLogin: serverTimestamp()
