@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save, User, Bell, Shield, Globe } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { getFirebaseServices } from '../services/firebase';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const Settings = () => {
   const { user } = useAuth();
@@ -30,13 +32,79 @@ const Settings = () => {
 
   const [activeTab, setActiveTab] = useState('profile');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      if (!user) return;
+      
+      try {
+        const { db } = getFirebaseServices();
+        const userSettingsDoc = await getDoc(doc(db, 'userSettings', user.id));
+        
+        if (userSettingsDoc.exists()) {
+          const data = userSettingsDoc.data();
+          setSettings(prev => ({
+            ...prev,
+            profile: {
+              ...prev.profile,
+              name: data.name || user.name,
+              email: data.email || user.email,
+              role: data.role || user.role
+            },
+            notifications: data.notifications || prev.notifications,
+            security: data.security || prev.security,
+            general: data.general || prev.general
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching user settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserSettings();
+  }, [user]);
 
   const handleSave = async () => {
+    if (!user) return;
+    
     setSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setSaving(false);
-    alert('Settings saved successfully!');
+    try {
+      const { db } = getFirebaseServices();
+      const userSettingsRef = doc(db, 'userSettings', user.id);
+      
+      const settingsData = {
+        userId: user.id,
+        name: settings.profile.name,
+        email: settings.profile.email,
+        role: settings.profile.role,
+        notifications: settings.notifications,
+        security: settings.security,
+        general: settings.general,
+        updatedAt: new Date()
+      };
+      
+      await setDoc(userSettingsRef, settingsData, { merge: true });
+      
+      // Also update user profile in users collection if it exists
+      const userDocRef = doc(db, 'users', user.id);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        await updateDoc(userDocRef, {
+          name: settings.profile.name,
+          role: settings.profile.role
+        });
+      }
+      
+      alert('Settings saved successfully!');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Failed to save settings. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const updateSetting = (category, key, value) => {
@@ -55,6 +123,14 @@ const Settings = () => {
     { id: 'security', name: 'Security', icon: Shield },
     { id: 'general', name: 'General', icon: Globe }
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -75,7 +151,7 @@ const Settings = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-ghana-primary-500 text-ghana-primary-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -92,7 +168,7 @@ const Settings = () => {
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
+                <h3 className="text-base font-medium text-gray-900 mb-4">Profile Information</h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -102,7 +178,7 @@ const Settings = () => {
                       type="text"
                       value={settings.profile.name}
                       onChange={(e) => updateSetting('profile', 'name', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -113,7 +189,7 @@ const Settings = () => {
                       type="email"
                       value={settings.profile.email}
                       onChange={(e) => updateSetting('profile', 'email', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -123,7 +199,7 @@ const Settings = () => {
                     <select
                       value={settings.profile.role}
                       onChange={(e) => updateSetting('profile', 'role', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
                     >
                       <option value="admin">Administrator</option>
                       <option value="editor">Editor</option>
@@ -139,7 +215,7 @@ const Settings = () => {
           {activeTab === 'notifications' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Preferences</h3>
+                <h3 className="text-base font-medium text-gray-900 mb-4">Notification Preferences</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -153,7 +229,7 @@ const Settings = () => {
                         onChange={(e) => updateSetting('notifications', 'emailNotifications', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ghana-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ghana-primary-600"></div>
                     </label>
                   </div>
 
@@ -169,7 +245,7 @@ const Settings = () => {
                         onChange={(e) => updateSetting('notifications', 'pushNotifications', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ghana-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ghana-primary-600"></div>
                     </label>
                   </div>
 
@@ -185,7 +261,7 @@ const Settings = () => {
                         onChange={(e) => updateSetting('notifications', 'contentUpdates', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ghana-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ghana-primary-600"></div>
                     </label>
                   </div>
 
@@ -201,7 +277,7 @@ const Settings = () => {
                         onChange={(e) => updateSetting('notifications', 'systemAlerts', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ghana-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ghana-primary-600"></div>
                     </label>
                   </div>
                 </div>
@@ -213,7 +289,7 @@ const Settings = () => {
           {activeTab === 'security' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Security Settings</h3>
+                <h3 className="text-base font-medium text-gray-900 mb-4">Security Settings</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -227,7 +303,7 @@ const Settings = () => {
                         onChange={(e) => updateSetting('security', 'twoFactorAuth', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ghana-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ghana-primary-600"></div>
                     </label>
                   </div>
 
@@ -261,7 +337,7 @@ const Settings = () => {
           {activeTab === 'general' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">General Preferences</h3>
+                <h3 className="text-base font-medium text-gray-900 mb-4">General Preferences</h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -270,7 +346,7 @@ const Settings = () => {
                     <select
                       value={settings.general.language}
                       onChange={(e) => updateSetting('general', 'language', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
                     >
                       <option value="en">English</option>
                       <option value="fr">French</option>
@@ -284,7 +360,7 @@ const Settings = () => {
                     <select
                       value={settings.general.timezone}
                       onChange={(e) => updateSetting('general', 'timezone', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
                     >
                       <option value="UTC">UTC</option>
                       <option value="GMT">GMT</option>
@@ -299,7 +375,7 @@ const Settings = () => {
                     <select
                       value={settings.general.dateFormat}
                       onChange={(e) => updateSetting('general', 'dateFormat', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
                     >
                       <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                       <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -316,7 +392,7 @@ const Settings = () => {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium flex items-center transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary flex items-center"
             >
               <Save className="h-4 w-4 mr-2" />
               {saving ? 'Saving...' : 'Save Changes'}

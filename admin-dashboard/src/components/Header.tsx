@@ -1,110 +1,119 @@
-import React, { useState } from 'react';
-import { Bell, Search, Menu, X, CheckCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Bell, X, CheckCircle, AlertCircle, LayoutDashboard, FileText, BarChart3, Settings, LogOut, Menu } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const notifications = [];
 
-  // Mock notifications data
-  const notifications = [
-    {
-      id: 1,
-      title: 'New Content Published',
-      message: 'Article "School Feeding Program Updates" has been published',
-      type: 'success',
-      time: '2 minutes ago',
-      read: false
-    },
-    {
-      id: 2,
-      title: 'System Update',
-      message: 'Database backup completed successfully',
-      type: 'info',
-      time: '1 hour ago',
-      read: false
-    },
-    {
-      id: 3,
-      title: 'Content Review Required',
-      message: 'Event "Regional Meeting" needs your review',
-      type: 'warning',
-      time: '3 hours ago',
-      read: true
-    }
+  const navigation = [
+    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Content Manager', href: '/content', icon: FileText },
+    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const handleNotificationClick = () => {
+  // Fetch notifications from Firestore would go here
+  // For now, notifications will be empty until implemented
+
+  const handleNotificationClick = (): void => {
     setShowNotifications(!showNotifications);
   };
 
-  const markAsRead = (id: number) => {
+  const markAsRead = (id: number): void => {
     // In a real app, this would update the notification in the database
-    console.log('Mark notification as read:', id);
+    console.log('Mark notification as read', { notificationId: id });
   };
 
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setShowMobileMenu(false);
+      }
+    };
+
+    if (showMobileMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMobileMenu]);
+
   return (
-    <header className="bg-white shadow-soft border-b border-ghana-neutral-200 px-6 py-4 sticky top-0 z-40 backdrop-blur-sm bg-white/95">
+    <header className="bg-ghana-secondary-700 shadow-soft border-b border-ghana-secondary-600 px-4 md:px-6 py-2 md:py-3 sticky top-0 z-40 backdrop-blur-sm">
       <div className="flex items-center justify-between">
-        {/* Left side - Logo and Page title */}
+        {/* Left side - Logo */}
         <div className="flex items-center space-x-4">
-          <div className="flex-shrink-0">
-            <img 
-              src="/Logo.jpeg" 
-              alt="Ghana School Feeding Programme Logo" 
-              className="h-24 w-auto object-contain border-2 border-blue-500 rounded-lg"
-              style={{
-                filter: 'none',
-                opacity: 1,
-                display: 'block',
-                backgroundColor: 'white',
-                padding: '4px'
-              }}
-              onError={(e) => {
-                e.currentTarget.src = '/api/placeholder/96/96';
-              }}
-            />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-ghana-neutral-900">Admin Dashboard</h1>
-            <p className="text-sm text-ghana-neutral-600 flex items-center mt-1">
-              Welcome back, <span className="font-semibold text-ghana-neutral-900 ml-1">{user?.name || 'Administrator'}</span>
-              <span className="ml-2 badge-success">Active Session</span>
-            </p>
-          </div>
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="md:hidden p-2 text-ghana-gold-100 hover:text-ghana-gold-300 hover:bg-ghana-secondary-600 rounded-lg transition-all duration-200"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
+          {/* Logo */}
+          <img
+            src="/Logo.jpeg"
+            alt="Ghana School Feeding Programme Logo"
+            className="h-10 md:h-12 w-auto object-contain"
+            onError={(e) => {
+              e.currentTarget.src = '/api/placeholder/48/48';
+            }}
+          />
         </div>
 
-        {/* Right side - Actions */}
-        <div className="flex items-center space-x-6">
-          <>
-          {/* Search */}
-          <div className="relative hidden md:block">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-ghana-neutral-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="input-field pl-10 pr-4 py-2.5 w-80"
-            />
-          </div>
+        {/* Center - Navigation */}
+        <nav className="hidden md:flex items-center space-x-1">
+          {navigation.map((item) => {
+            const IconComponent = item.icon;
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-ghana-gold-500 text-ghana-secondary-900'
+                    : 'text-ghana-gold-100 hover:bg-ghana-secondary-600 hover:text-ghana-gold-300'
+                }`}
+              >
+                <IconComponent className="h-4 w-4 mr-2" />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
 
-          {/* Notifications */}
-          <div className="relative">
-            <button 
+        {/* Right side - Actions */}
+        <div className="flex items-center space-x-2 md:space-x-6">
+          {/* Notifications - hidden on very small screens */}
+          <div className="relative hidden sm:block">
+            <button
               onClick={handleNotificationClick}
-              className={`relative p-2 text-ghana-neutral-400 hover:text-ghana-neutral-600 hover:bg-ghana-neutral-100 focus:outline-none focus:ring-2 focus:ring-ghana-primary-500 focus:ring-offset-2 rounded-lg transition-all duration-200 group ${
-                showNotifications ? 'bg-ghana-neutral-100 text-ghana-neutral-700' : ''
+              className={`relative p-2 text-ghana-gold-100 hover:text-ghana-gold-300 hover:bg-ghana-secondary-600 focus:outline-none focus:ring-2 focus:ring-ghana-gold-500 focus:ring-offset-2 rounded-lg transition-all duration-200 group ${
+                showNotifications ? 'bg-ghana-secondary-600 text-ghana-gold-300' : ''
               }`}
             >
-              <Bell className="h-6 w-6" />
-              <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
-              <div className="absolute -bottom-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold animate-bounce">3</div>
+              <Bell className="h-5 w-5 md:h-6 md:w-6" />
+              {notifications.filter(n => !n.read).length > 0 && (
+                <div className="absolute -bottom-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold animate-bounce">
+                  {notifications.filter(n => !n.read).length}
+                </div>
+              )}
             </button>
 
             {/* Notifications Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-ghana-neutral-200 z-50">
+              <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-xl border border-ghana-neutral-200 z-50">
                 <div className="p-4 border-b border-ghana-neutral-200">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-semibold text-ghana-neutral-900">Notifications</h3>
@@ -163,28 +172,69 @@ const Header = () => {
             </div>
 
           {/* User Menu */}
-          <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-ghana-neutral-100 transition-colors duration-200 cursor-pointer group">
+          <div className="flex items-center space-x-1 md:space-x-3 p-1 md:p-2 rounded-lg hover:bg-ghana-secondary-600 transition-colors duration-200 cursor-pointer group">
             <div className="relative">
-              <img
-                className="w-10 h-10 rounded-xl border-2 border-ghana-neutral-200 shadow-soft group-hover:shadow-medium transition-shadow duration-200"
-                src={user?.avatar || '/api/placeholder/40/40'}
-                alt={user?.name}
-              />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-ghana-secondary-500 rounded-full border-2 border-white animate-pulse-slow"></div>
+              {user?.avatar ? (
+                <img
+                  className="w-7 h-7 md:w-10 md:h-10 rounded-xl border-2 border-ghana-gold-300 shadow-soft group-hover:shadow-medium transition-shadow duration-200"
+                  src={user.avatar}
+                  alt={user?.name}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              ) : null}
+              <div className={`w-7 h-7 md:w-10 md:h-10 rounded-xl border-2 border-ghana-gold-300 shadow-soft group-hover:shadow-medium transition-shadow duration-200 flex items-center justify-center bg-ghana-gold-500 ${user?.avatar ? 'hidden' : ''}`}>
+                <span className="text-xs md:text-sm font-semibold text-ghana-secondary-900">
+                  {user?.name?.charAt(0).toUpperCase() || 'A'}
+                </span>
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-ghana-gold-400 rounded-full border-2 border-ghana-secondary-700 animate-pulse-slow"></div>
             </div>
             <div className="hidden lg:block text-left">
-              <p className="text-sm font-semibold text-ghana-neutral-900">{user?.name || 'Admin'}</p>
-              <p className="text-xs text-ghana-neutral-500">{user?.email || 'admin@gsfp.gov.gh'}</p>
+              <p className="text-sm font-semibold text-ghana-gold-100">{user?.name || 'Admin'}</p>
+              <p className="text-xs text-ghana-gold-300">{user?.email || ''}</p>
             </div>
           </div>
 
-          {/* Mobile menu button */}
-          <button className="lg:hidden p-2 text-ghana-neutral-400 hover:text-ghana-neutral-600 hover:bg-ghana-neutral-100 focus:outline-none focus:ring-2 focus:ring-ghana-primary-500 focus:ring-offset-2 rounded-lg transition-all duration-200">
-            <Menu className="h-6 w-6" />
+          {/* Logout */}
+          <button
+            onClick={logout}
+            className="flex items-center px-2 md:px-4 py-2 text-sm font-medium text-ghana-gold-100 rounded-lg hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 group"
+          >
+            <LogOut className="h-4 w-4 mr-0 md:mr-2 group-hover:scale-110 transition-transform duration-200" />
+            <span className="hidden sm:inline">Logout</span>
           </button>
-          </>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {showMobileMenu && (
+        <div ref={mobileMenuRef} className="md:hidden border-t border-ghana-secondary-600 bg-ghana-secondary-800 absolute left-0 right-0 top-full z-50 shadow-xl">
+          <nav className="px-4 py-3 space-y-1">
+            {navigation.map((item) => {
+              const IconComponent = item.icon;
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => setShowMobileMenu(false)}
+                  className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-ghana-gold-500 text-ghana-secondary-900'
+                      : 'text-ghana-gold-100 hover:bg-ghana-secondary-600 hover:text-ghana-gold-300'
+                  }`}
+                >
+                  <IconComponent className="h-4 w-4 mr-3" />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

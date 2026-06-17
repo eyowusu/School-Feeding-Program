@@ -21,8 +21,7 @@ import {
   doc,
   query,
   orderBy,
-  serverTimestamp,
-  writeBatch
+  serverTimestamp
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { getFirebaseServices } from '../services/firebase';
@@ -38,7 +37,6 @@ const ContentManager = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const [notification, setNotification] = useState(null);
 
   // Filter content based on search and type
@@ -76,18 +74,12 @@ const ContentManager = () => {
   }, [fetchContent]);
 
   const showNotification = (message, type = 'success') => {
-    console.log('Showing notification:', { message, type }); // Debug log
     setNotification({ message, type });
     setTimeout(() => {
-      console.log('Auto-hiding notification'); // Debug log
       setNotification(null);
     }, 5000);
   };
 
-  // Test function for debugging notifications
-  const testNotification = () => {
-    showNotification('Test notification - click to dismiss!', 'success');
-  };
 
   const handleFileUpload = async (file) => {
     if (!file) return null;
@@ -202,7 +194,6 @@ const ContentManager = () => {
 
     try {
       const { db, storage } = getFirebaseServices();
-      const batch = writeBatch(db);
       const promises = selectedItems.map(id => {
         const contentItem = content.find(item => item.id === id);
         const deletePromises = [deleteDoc(doc(db, 'content', id))];
@@ -320,19 +311,13 @@ const ContentManager = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Content Manager</h1>
+          <h1 className="text-xl font-bold text-gray-900">Content Manager</h1>
           <p className="text-gray-600">Create, edit, and manage website content</p>
         </div>
         <div className="flex gap-2">
           <button
-            onClick={testNotification}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors duration-200"
-          >
-            Test Notification
-          </button>
-          <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors duration-200"
+className="btn-primary flex items-center"
           >
           <Plus className="h-5 w-5 mr-2" />
           Add Content
@@ -340,7 +325,7 @@ const ContentManager = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -350,7 +335,7 @@ const ContentManager = () => {
                 placeholder="Search content..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -359,7 +344,7 @@ const ContentManager = () => {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-ghana-primary-500 focus:border-transparent"
             >
               <option value="all">All Types</option>
               <option value="news">News</option>
@@ -374,23 +359,23 @@ const ContentManager = () => {
 
       {/* Bulk Actions */}
       {selectedItems.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-ghana-primary-50 border border-ghana-primary-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-blue-700">
+            <span className="text-sm text-ghana-primary-700">
               {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
             </span>
             <div className="flex gap-2">
               <button
                 onClick={handleBulkPublishClick}
                 disabled={selectedItems.length === 0}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+className="btn-primary text-sm px-3 py-1"
               >
                 Publish
               </button>
               <button
                 onClick={handleBulkDeleteClick}
                 disabled={selectedItems.length === 0}
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+className="btn-danger text-sm px-3 py-1"
               >
                 Delete
               </button>
@@ -454,7 +439,7 @@ const ContentManager = () => {
                         type="checkbox"
                         checked={selectedItems.includes(item.id)}
                         onChange={() => handleSelectItem(item.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+className="rounded border-gray-300 text-ghana-primary-600 focus:ring-ghana-primary-500"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -475,7 +460,7 @@ const ContentManager = () => {
                           item.featuredSections.map(section => (
                             <span
                               key={section}
-                              className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 capitalize"
+className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-ghana-primary-100 text-ghana-primary-800 capitalize"
                             >
                               {section}
                             </span>
@@ -503,13 +488,13 @@ const ContentManager = () => {
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => setEditingItem(item)}
-                          className="text-yellow-600 hover:text-yellow-900"
+className="text-ghana-warning-600 hover:text-ghana-warning-900"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(item.id)}
-                          className="text-red-600 hover:text-red-900"
+className="text-ghana-error-600 hover:text-ghana-error-900"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -554,7 +539,6 @@ const ContentManager = () => {
           }
         }}
         editingItem={editingItem}
-        uploading={uploading}
       />
     </div>
   );

@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
-import { auth, getFirebaseServices, firestoreFunctions } from '../services/firebase';
+import { getFirebaseServices, firestoreFunctions } from '../services/firebase';
 import { AuthContextType, User } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +28,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
+    // Ensure Firebase is initialized before using auth
+    const { auth } = getFirebaseServices();
+    
+    if (!auth) {
+      console.error('Firebase auth not initialized');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         // Get Firebase services to ensure db is initialized
@@ -38,20 +47,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userDoc = await getDoc(db.collection('users').doc(firebaseUser.uid));
         if (userDoc.exists()) {
           const profileData = userDoc.data();
+          const isDevelopment = process.env.NODE_ENV === 'development';
           setUser({
             id: firebaseUser.uid,
             email: firebaseUser.email || '',
             name: firebaseUser.displayName || profileData.name || '',
-            role: profileData.role || 'editor',
+            role: isDevelopment ? 'admin' : (profileData.role || 'editor'), // Admin role in development
             avatar: firebaseUser.photoURL || profileData.avatar,
             emailVerified: firebaseUser.emailVerified
           });
           setUserProfile(profileData);
         } else {
           // Create user profile if it doesn't exist
+          const isDevelopment = process.env.NODE_ENV === 'development';
           const defaultProfile = {
             name: firebaseUser.displayName || 'Administrator',
-            role: 'editor',
+            role: isDevelopment ? 'admin' : 'editor', // Admin role in development for easy access
             avatar: firebaseUser.photoURL || null,
             createdAt: new Date(),
             lastLogin: new Date()
@@ -79,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (email, password, name) => {
     try {
+      const { auth } = getFirebaseServices();
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
@@ -109,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email, password) => {
     try {
+      const { auth } = getFirebaseServices();
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error) {
@@ -118,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     try {
+      const { auth } = getFirebaseServices();
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
@@ -145,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      const { auth } = getFirebaseServices();
       await signOut(auth);
       return { success: true };
     } catch (error) {
@@ -154,6 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email) => {
     try {
+      const { auth } = getFirebaseServices();
       await sendPasswordResetEmail(auth, email);
       return { success: true };
     } catch (error) {
@@ -163,6 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = async (updates) => {
     try {
+      const { auth } = getFirebaseServices();
       if (auth.currentUser) {
         await updateFirebaseProfile(auth.currentUser, updates);
         // Update Firestore profile

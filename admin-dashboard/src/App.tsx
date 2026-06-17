@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ReactGA from 'react-ga';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ContentManager from './pages/ContentManager';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
-import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
@@ -15,33 +15,74 @@ import './App.css';
 import { configManager } from './shared/config-manager';
 import { syncService } from './shared/sync-service';
 import { getFirebaseServices } from './services/firebase';
+import { logger } from './services/logger';
 
 function App() {
   // Initialize shared services on app startup
   React.useEffect(() => {
+    // Initialize Google Analytics
+    const gaTrackingId = process.env.REACT_APP_GA_TRACKING_ID;
+    if (gaTrackingId && gaTrackingId !== 'G-XXXXXXXXXX') {
+      ReactGA.initialize(gaTrackingId);
+      ReactGA.pageview(window.location.pathname + window.location.search);
+      logger.info('Google Analytics initialized', { trackingId: gaTrackingId });
+    }
+
     // Initialize configuration
     try {
       const config = configManager.initialize();
-      console.log('Admin Dashboard - Configuration initialized:', config.environment);
+      logger.info('Admin Dashboard - Configuration initialized', { environment: config.environment });
 
       // Validate configuration
       const validation = configManager.validateConfig();
       if (!validation.isValid) {
-        console.warn('Configuration validation warnings:', validation.errors);
+        logger.warn('Configuration validation warnings', { errors: validation.errors });
       }
 
       // Initialize Firebase services now that config is ready
       const firebaseServices = getFirebaseServices();
-      console.log('Firebase services initialized:', firebaseServices ? 'Success' : 'Failed');
+      logger.info('Firebase services initialized', { success: !!firebaseServices });
 
       // Initialize real-time sync for admin collections
       if (config.features.realTimeSync) {
         syncService.initialize(['articles', 'events', 'media', 'partners', 'content'])
-          .then(() => console.log('Real-time sync initialized for admin'))
-          .catch(error => console.error('Failed to initialize real-time sync:', error));
+          .then(() => logger.info('Real-time sync initialized for admin'))
+          .catch(error => logger.error('Failed to initialize real-time sync', { error: error.message }));
       }
+
+      // Set up error tracking
+      window.addEventListener('error', (event) => {
+        logger.error('Global error', { 
+          message: event.error?.message,
+          stack: event.error?.stack,
+          filename: event.filename,
+          lineno: event.lineno
+        });
+      });
+
+      window.addEventListener('unhandledrejection', (event) => {
+        logger.error('Unhandled promise rejection', { reason: event.reason });
+      });
+
+      // Log application startup
+      logger.info('Admin Dashboard application started', {
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      });
     } catch (error) {
-      console.error('Failed to initialize shared services:', error);
+      logger.error('Failed to initialize shared services', { error: error.message });
+    }
+  }, []);
+
+  // Track page views on route changes
+  React.useEffect(() => {
+    const gaTrackingId = process.env.REACT_APP_GA_TRACKING_ID;
+    if (gaTrackingId && gaTrackingId !== 'G-XXXXXXXXXX') {
+      const handleLocationChange = () => {
+        ReactGA.pageview(window.location.pathname + window.location.search);
+      };
+      window.addEventListener('popstate', handleLocationChange);
+      return () => window.removeEventListener('popstate', handleLocationChange);
     }
   }, []);
 
@@ -69,22 +110,24 @@ function AppContent() {
     return <Login />;
   }
 
+  // Check if user has admin role
+  if (user.role !== 'admin') {
+    return <Login />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-ghana-neutral-50 via-white to-ghana-neutral-100">
       <ErrorBoundary>
-        <Sidebar />
-        <div className="ml-64 min-h-screen">
-          <Header />
-          <main className="p-8 bg-transparent">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/content" element={<ContentManager />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-        </div>
+        <Header />
+        <main className="p-4 md:p-6 lg:p-8 bg-transparent">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/content" element={<ContentManager />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
       </ErrorBoundary>
     </div>
   );

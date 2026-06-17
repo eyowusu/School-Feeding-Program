@@ -172,7 +172,7 @@ class ConfigManager {
     const config = this.getConfig();
     return {
       enableDebugLogging: config.isDevelopment && this.parseBoolean(process.env.REACT_APP_DEBUG_MODE, false),
-      enableMockData: config.isDevelopment && this.parseBoolean(process.env.REACT_APP_ENABLE_MOCK_DATA, true),
+      enableMockData: config.isDevelopment && this.parseBoolean(process.env.REACT_APP_ENABLE_MOCK_DATA, true), // Default to true in dev
       enableErrorReporting: config.isProduction
     };
   }
