@@ -1,15 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  updateProfile as updateFirebaseProfile,
-  GoogleAuthProvider,
-  signInWithPopup
-} from 'firebase/auth';
-import { getFirebaseServices, firestoreFunctions } from '../services/firebase';
+import { getFirebaseServices, firestoreFunctions, authFunctions } from '../services/firebase';
 import { AuthContextType, User } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,7 +20,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Ensure Firebase is initialized before using auth
     const { auth } = getFirebaseServices();
-    
+    const { onAuthStateChanged } = authFunctions();
+
     if (!auth) {
       console.error('Firebase auth not initialized');
       setLoading(false);
@@ -91,11 +82,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (email, password, name) => {
     try {
       const { auth } = getFirebaseServices();
+      const { createUserWithEmailAndPassword, updateProfile } = authFunctions();
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       // Update display name
-      await updateFirebaseProfile(user, {
+      await updateProfile(user, {
         displayName: name
       });
 
@@ -123,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Attempting login with:', email);
       const { auth } = getFirebaseServices();
+      const { signInWithEmailAndPassword } = authFunctions();
       console.log('Auth service:', auth);
       const result = await signInWithEmailAndPassword(auth, email, password);
       console.log('Login result:', result);
@@ -136,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithGoogle = async () => {
     try {
       const { auth } = getFirebaseServices();
+      const { signInWithPopup, GoogleAuthProvider } = authFunctions();
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
@@ -164,6 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       const { auth } = getFirebaseServices();
+      const { signOut } = authFunctions();
       await signOut(auth);
       return { success: true };
     } catch (error) {
@@ -174,6 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resetPassword = async (email) => {
     try {
       const { auth } = getFirebaseServices();
+      const { sendPasswordResetEmail } = authFunctions();
       await sendPasswordResetEmail(auth, email);
       return { success: true };
     } catch (error) {
@@ -184,6 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates) => {
     try {
       const { auth } = getFirebaseServices();
+      const { updateProfile: updateFirebaseProfile } = authFunctions();
       if (auth.currentUser) {
         await updateFirebaseProfile(auth.currentUser, updates);
         // Update Firestore profile

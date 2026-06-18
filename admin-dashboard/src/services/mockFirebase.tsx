@@ -326,6 +326,7 @@ export class GoogleAuthProvider {
   constructor() {
     this.providerId = 'google.com';
   }
+  providerId = 'google.com';
 }
 
 // Mock server timestamp

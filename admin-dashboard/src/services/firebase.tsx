@@ -7,7 +7,15 @@ import {
   initializeApp
 } from 'firebase/app';
 import {
-  getAuth
+  getAuth,
+  createUserWithEmailAndPassword as realCreateUserWithEmailAndPassword,
+  signInWithEmailAndPassword as realSignInWithEmailAndPassword,
+  signOut as realSignOut,
+  onAuthStateChanged as realOnAuthStateChanged,
+  sendPasswordResetEmail as realSendPasswordResetEmail,
+  updateProfile as realUpdateProfile,
+  GoogleAuthProvider as realGoogleAuthProvider,
+  signInWithPopup as realSignInWithPopup
 } from 'firebase/auth';
 import {
   getFirestore
@@ -125,6 +133,39 @@ export const firestoreFunctions = () => {
       onSnapshot,
       addDoc,
       writeBatch
+    };
+  }
+};
+
+// Export appropriate auth functions based on current mode
+export const authFunctions = () => {
+  if (!isInitialized) {
+    initializeFirebase();
+  }
+  // If using mock Firebase, export mock functions, otherwise export real functions
+  if (auth === MockFirebase.auth) {
+    // Mock Firebase functions
+    return {
+      createUserWithEmailAndPassword: MockFirebase.createUserWithEmailAndPassword,
+      signInWithEmailAndPassword: MockFirebase.signInWithEmailAndPassword,
+      signInWithPopup: MockFirebase.signInWithPopup,
+      signOut: MockFirebase.signOut,
+      onAuthStateChanged: MockFirebase.onAuthStateChanged,
+      sendPasswordResetEmail: MockFirebase.sendPasswordResetEmail,
+      updateProfile: MockFirebase.updateProfile,
+      GoogleAuthProvider: MockFirebase.GoogleAuthProvider
+    };
+  } else {
+    // Real Firebase functions
+    return {
+      createUserWithEmailAndPassword: realCreateUserWithEmailAndPassword,
+      signInWithEmailAndPassword: realSignInWithEmailAndPassword,
+      signInWithPopup: realSignInWithPopup,
+      signOut: realSignOut,
+      onAuthStateChanged: realOnAuthStateChanged,
+      sendPasswordResetEmail: realSendPasswordResetEmail,
+      updateProfile: realUpdateProfile,
+      GoogleAuthProvider: realGoogleAuthProvider
     };
   }
 };
