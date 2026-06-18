@@ -69,7 +69,7 @@ const Contact = () => {
     {
       icon: Clock,
       title: 'Office Hours',
-      details: ['Monday - Friday: 8:00 AM - 5:00 PM', 'Saturday: 9:00 AM - 2:00 PM'],
+      details: ['Monday - Friday: 8:00 AM - 5:00 PM'],
       color: 'text-ghana-secondary-600'
     }
   ];

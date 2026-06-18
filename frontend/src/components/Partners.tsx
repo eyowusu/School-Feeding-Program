@@ -58,6 +58,42 @@ const Partners = () => {
       website: "https://www.worldbank.org",
       category: "international"
     },
+    {
+      id: 7,
+      name: "CARE International",
+      logo: "/coat1.jpg",
+      type: "International Partner",
+      description: "Working in Ghana to provide emergency aid, boost equality for women and girls, help communities adapt to climate change, and increase access to health services, food, and water.",
+      website: "https://www.care-international.org/our-work/where-we-work/ghana",
+      category: "international"
+    },
+    {
+      id: 8,
+      name: "Ministry of Climate Change and Sustainability",
+      logo: "/coat1.jpg",
+      type: "Government Partner",
+      description: "Natural Resources, Environment and Climate Change (NREC) Unit under the Ministry of Finance, focusing on climate resilience and sustainable development.",
+      website: "https://mofep.gov.gh/divisions/rsd/climate-change",
+      category: "government"
+    },
+    {
+      id: 9,
+      name: "Feed Ghana Programme",
+      logo: "/coat1.jpg",
+      type: "Government Partner",
+      description: "Agricultural initiative supporting school feeding programs through local food production and farmer partnerships.",
+      website: "https://mofa.gov.gh/site/index.php/feed-ghana",
+      category: "government"
+    },
+    {
+      id: 10,
+      name: "Ghana Gold Board",
+      logo: "/coat1.jpg",
+      type: "Government Partner",
+      description: "The sole authority with exclusive rights to buy, sell, weigh, grade, assay, value and export gold and other precious minerals in Ghana.",
+      website: "https://goldbod.gov.gh/",
+      category: "government"
+    },
   ];
 
   const containerVariants = {
