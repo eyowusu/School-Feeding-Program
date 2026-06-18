@@ -121,11 +121,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email, password) => {
     try {
+      console.log('Attempting login with:', email);
       const { auth } = getFirebaseServices();
-      await signInWithEmailAndPassword(auth, email, password);
+      console.log('Auth service:', auth);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login result:', result);
       return { success: true };
     } catch (error) {
-      return { success: false, error: getErrorMessage(error.code) };
+      console.error('Login error:', error);
+      return { success: false, error: getErrorMessage(error.code) || error.message || 'An error occurred' };
     }
   };
 
