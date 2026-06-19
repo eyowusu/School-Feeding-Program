@@ -34,6 +34,12 @@ const localPhotos = [
   { id: 'cat9', title: 'Feeding Programme Support', description: 'Caterers supporting the national feeding initiative', url: '/media/cat9.jpg', thumbnail: '/media/cat9.jpg', category: 'Caterers', location: 'Ghana', date: '2025-03-02', tags: ['support', 'programme'], isFeatured: false },
 ];
 
+const localVideos = [
+  { id: 'video1', title: 'School Feeding Programme Overview', description: 'An overview of the Ghana School Feeding Programme and its impact on children across the country', url: '/media/Video1.mp4', thumbnail: '/media/Sch1.jpg', category: 'Programme', duration: '0:00', date: '2025-01-15', tags: ['overview', 'programme'], isFeatured: true },
+  { id: 'video2', title: 'Feeding Programme in Action', description: 'Watch the school feeding programme in action as meals are prepared and served to school children', url: '/media/Video2.mp4', thumbnail: '/media/Sch2.jpg', category: 'Schools', duration: '0:00', date: '2025-01-14', tags: ['action', 'schools'], isFeatured: true },
+  { id: 'video3', title: 'Community Impact Stories', description: 'Stories from communities benefiting from the school feeding programme and its positive effects', url: '/media/Video3.mp4', thumbnail: '/media/Sch3.jpg', category: 'Community', duration: '0:00', date: '2025-01-13', tags: ['community', 'impact'], isFeatured: true },
+];
+
 const categories = [
   {
     id: 'featured',
@@ -63,10 +69,10 @@ const categories = [
 
 const MediaCentre = () => {
   const [photos, setPhotos] = useState(localPhotos);
-  const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState(localVideos);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('photos');
+  const [activeTab, setActiveTab] = useState('videos');
   const [selectedItem, setSelectedItem] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -139,7 +145,7 @@ const MediaCentre = () => {
       });
 
       setPhotos([...localPhotos, ...photosData]);
-      setVideos(videosData);
+      setVideos([...localVideos, ...videosData]);
     } catch (err) {
       console.error('Error fetching media:', err);
     } finally {
@@ -251,17 +257,6 @@ const MediaCentre = () => {
         <div className="flex justify-center mb-12">
           <div className="bg-white rounded-lg p-1 shadow-lg">
             <button
-              onClick={() => setActiveTab('photos')}
-              className={`px-8 py-3 rounded-md font-medium transition-all duration-300 inline-flex items-center gap-2 ${
-                activeTab === 'photos'
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-green-600'
-              }`}
-            >
-              <ImageIcon className="h-4 w-4" />
-              Photos
-            </button>
-            <button
               onClick={() => setActiveTab('videos')}
               className={`px-8 py-3 rounded-md font-medium transition-all duration-300 inline-flex items-center gap-2 ${
                 activeTab === 'videos'
@@ -271,6 +266,17 @@ const MediaCentre = () => {
             >
               <Play className="h-4 w-4" />
               Videos
+            </button>
+            <button
+              onClick={() => setActiveTab('photos')}
+              className={`px-8 py-3 rounded-md font-medium transition-all duration-300 inline-flex items-center gap-2 ${
+                activeTab === 'photos'
+                  ? 'bg-green-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-green-600'
+              }`}
+            >
+              <ImageIcon className="h-4 w-4" />
+              Photos
             </button>
           </div>
         </div>
@@ -332,7 +338,16 @@ const MediaCentre = () => {
               >
                 <div className="relative overflow-hidden">
                   <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                    {item.thumbnail ? (
+                    {activeTab === 'videos' ? (
+                      <video
+                        src={item.url}
+                        muted
+                        autoPlay
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    ) : item.thumbnail ? (
                       <img
                         src={item.thumbnail}
                         alt={item.title}
@@ -452,7 +467,6 @@ const MediaCentre = () => {
                     src={selectedItem.url}
                     controls
                     className="w-full max-h-96 object-contain bg-black"
-                    poster={selectedItem.thumbnail}
                   />
                 ) : (
                   <img
