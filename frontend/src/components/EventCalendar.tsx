@@ -86,15 +86,15 @@ const EventCalendar = () => {
   const getEventTypeColor = (type) => {
     switch (type) {
       case 'Workshop':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-ghana-primary-100 text-ghana-primary-800';
       case 'Conference':
-        return 'bg-green-100 text-green-800';
+        return 'bg-ghana-secondary-100 text-ghana-secondary-800';
       case 'Meeting':
         return 'bg-yellow-100 text-yellow-800';
       case 'Review':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-ghana-primary-100 text-ghana-primary-800';
       case 'Outreach':
-        return 'bg-red-100 text-red-800';
+        return 'bg-ghana-secondary-100 text-ghana-secondary-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -139,15 +139,15 @@ const EventCalendar = () => {
       days.push(
         <div
           key={day}
-          className={`p-2 border border-gray-200 cursor-pointer hover:bg-blue-50 transition-colors duration-200 ${
-            isToday ? 'bg-blue-100 font-semibold' : ''
+          className={`p-2 border border-gray-200 cursor-pointer hover:bg-ghana-primary-50 transition-colors duration-200 ${
+            isToday ? 'bg-ghana-primary-100 font-semibold' : ''
           }`}
           onClick={() => setSelectedDate(dateString)}
         >
           <div className="text-sm text-center mb-1">{day}</div>
           {dayEvents.length > 0 && (
             <div className="flex justify-center">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-ghana-primary-500 rounded-full"></div>
             </div>
           )}
         </div>
@@ -182,11 +182,11 @@ const EventCalendar = () => {
         <div className="mt-6 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-center space-x-6 text-sm">
             <div className="flex items-center">
-              <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+              <div className="w-3 h-3 bg-ghana-primary-500 rounded-full mr-2"></div>
               <span>Events</span>
             </div>
             <div className="flex items-center">
-              <div className="w-3 h-3 bg-blue-100 rounded-full mr-2"></div>
+              <div className="w-3 h-3 bg-ghana-primary-100 rounded-full mr-2"></div>
               <span>Today</span>
             </div>
           </div>
@@ -235,7 +235,7 @@ const EventCalendar = () => {
                   <Users className="h-4 w-4 mr-1" />
                   {event.attendees} expected
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                <button className="bg-ghana-primary-600 hover:bg-ghana-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
                   Register
                 </button>
               </div>
@@ -247,7 +247,7 @@ const EventCalendar = () => {
   };
 
   return (
-    <section className="py-20 bg-white" id="events">
+    <section className="py-20 bg-gray-50" id="events">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -324,7 +324,7 @@ const EventCalendar = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-gradient-to-br from-blue-600 to-green-600 rounded-lg p-6 text-white">
+            <div className="bg-gradient-to-br from-ghana-primary-600 to-ghana-secondary-600 rounded-lg p-6 text-white">
               <h3 className="text-lg font-semibold mb-4">Event Statistics</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">

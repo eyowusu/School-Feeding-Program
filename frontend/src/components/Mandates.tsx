@@ -71,14 +71,14 @@ const Mandates = () => {
   };
 
   return (
-    <section className="py-20 bg-gray-50" id="mandates">
+    <section className="py-20 bg-white" id="mandates">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16 bg-green-100 rounded-2xl shadow-lg p-8 border border-green-200"
+          className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Our Mandates
@@ -102,12 +102,12 @@ const Mandates = () => {
                 key={mandate.id}
                 variants={cardVariants}
                 whileHover={{ y: -5, transition: { duration: 0.3 } }}
-                className="bg-green-100 rounded-xl shadow-lg p-6 group hover:shadow-xl transition-all duration-300 border border-green-200"
+                className="bg-white rounded-xl shadow-lg p-6 group hover:shadow-xl transition-all duration-300 border border-gray-100"
               >
-                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br ${mandate.color} text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ghana-secondary-100 text-ghana-secondary-600 mb-4 group-hover:scale-110 transition-transform duration-300">
                   <IconComponent className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300">
+                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-ghana-secondary-600 transition-colors duration-300">
                   {mandate.title}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">

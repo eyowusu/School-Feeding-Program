@@ -189,7 +189,7 @@ const LatestNews = () => {
   };
 
   return (
-    <section className="py-20 bg-white" id="news">
+    <section className="py-20 bg-gray-50" id="news">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -262,13 +262,13 @@ const LatestNews = () => {
                       <span className="text-gray-500 text-sm">No Image</span>
                     </div>
                     <div className="absolute top-3 left-3">
-                      <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      <span className="bg-ghana-primary-600 text-white text-xs font-bold px-2 py-1 rounded-full">
                         {item.category}
                       </span>
                     </div>
                     {item.featured && (
                       <div className="absolute top-3 right-3">
-                        <span className="bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        <span className="bg-ghana-secondary-600 text-white text-xs font-bold px-2 py-1 rounded-full">
                           Featured
                         </span>
                       </div>
@@ -280,7 +280,7 @@ const LatestNews = () => {
                       <span className="mr-3">{formatDate(item.date)}</span>
                       <span>{item.readTime}</span>
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
+                    <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-ghana-primary-600 transition-colors duration-300 line-clamp-2">
                       {item.title}
                     </h4>
                     <p className="text-gray-600 text-sm mb-3 line-clamp-3">
@@ -291,7 +291,7 @@ const LatestNews = () => {
                         <User className="h-3 w-3 mr-1" />
                         {item.author || 'GSFP Communications'}
                       </div>
-                      <button className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium">
+                      <button className="inline-flex items-center text-ghana-primary-600 hover:text-ghana-primary-700 text-sm font-medium">
                         Read More
                         <ArrowRight className="h-3 w-3 ml-1" />
                       </button>
@@ -368,7 +368,7 @@ const LatestNews = () => {
                         <span className="text-gray-500 text-sm">No Image</span>
                       </div>
                       <div className="absolute top-3 left-3">
-                        <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        <span className="bg-ghana-primary-600 text-white text-xs font-bold px-2 py-1 rounded-full">
                           {item.category}
                         </span>
                       </div>
@@ -379,13 +379,13 @@ const LatestNews = () => {
                         <span className="mr-3">{formatDate(item.date)}</span>
                         <span>{item.readTime}</span>
                       </div>
-                      <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
+                      <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-ghana-primary-600 transition-colors duration-300 line-clamp-2">
                         {item.title}
                       </h4>
                       <p className="text-gray-600 text-sm mb-3 line-clamp-3">
                         {item.excerpt}
                       </p>
-                      <button className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200">
+                      <button className="inline-flex items-center text-ghana-primary-600 hover:text-ghana-primary-700 text-sm font-medium transition-colors duration-200">
                         Read More
                         <ArrowRight className="h-3 w-3 ml-1" />
                       </button>
@@ -405,7 +405,7 @@ const LatestNews = () => {
             >
               <Link
                 to="/news"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 sm:px-8 md:px-10 rounded-lg transition-colors duration-300 shadow-lg hover:shadow-xl inline-flex items-center text-sm sm:text-base"
+                className="bg-ghana-primary-600 hover:bg-ghana-primary-700 text-white font-bold py-3 px-6 sm:px-8 md:px-10 rounded-lg transition-colors duration-300 shadow-lg hover:shadow-xl inline-flex items-center text-sm sm:text-base"
               >
                 View All News & Articles
                 <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />

@@ -260,8 +260,8 @@ const MediaCentre = () => {
               onClick={() => setActiveTab('videos')}
               className={`px-8 py-3 rounded-md font-medium transition-all duration-300 inline-flex items-center gap-2 ${
                 activeTab === 'videos'
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-green-600'
+                  ? 'bg-ghana-primary-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-ghana-primary-600'
               }`}
             >
               <Play className="h-4 w-4" />
@@ -271,8 +271,8 @@ const MediaCentre = () => {
               onClick={() => setActiveTab('photos')}
               className={`px-8 py-3 rounded-md font-medium transition-all duration-300 inline-flex items-center gap-2 ${
                 activeTab === 'photos'
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-green-600'
+                  ? 'bg-ghana-primary-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-ghana-primary-600'
               }`}
             >
               <ImageIcon className="h-4 w-4" />
@@ -313,7 +313,7 @@ const MediaCentre = () => {
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                     {category.description}
                   </p>
-                  <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                  <button className="w-full bg-ghana-primary-600 hover:bg-ghana-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
                     View Gallery
                   </button>
                 </div>
@@ -374,14 +374,14 @@ const MediaCentre = () => {
                   )}
                   {item.isFeatured && (
                     <div className="absolute top-3 left-3">
-                      <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      <span className="bg-ghana-secondary-600 text-white text-xs font-bold px-2 py-1 rounded-full">
                         Featured
                       </span>
                     </div>
                   )}
                 </div>
                 <div className="p-4">
-                  <h4 className="font-semibold text-gray-900 mb-2 group-hover:text-green-600 transition-colors duration-300 line-clamp-1">
+                  <h4 className="font-semibold text-gray-900 mb-2 group-hover:text-ghana-primary-600 transition-colors duration-300 line-clamp-1">
                     {item.title}
                   </h4>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">

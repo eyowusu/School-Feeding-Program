@@ -6,6 +6,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Hero from './components/Hero';
+import Spotlight from './components/Spotlight';
 import MissionVision from './components/MissionVision';
 import Leadership from './components/Leadership';
 import Mandates from './components/Mandates';
@@ -84,6 +85,7 @@ function App() {
               <Route path="/" element={
                 <>
                   <Hero />
+                  <Spotlight />
                   <Programs />
                   <MissionVision />
                   <Leadership />

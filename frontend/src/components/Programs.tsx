@@ -181,7 +181,7 @@ const Programs = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="bg-yellow-100 rounded-2xl shadow-lg p-8 mb-16 border border-yellow-300"
+          className="bg-white rounded-2xl shadow-lg p-8 mb-16 border border-gray-100"
         >
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Program Impact</h3>

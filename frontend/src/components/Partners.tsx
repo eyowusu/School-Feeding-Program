@@ -138,7 +138,7 @@ const Partners = () => {
   };
 
   return (
-    <section className="py-20 bg-white" id="partners">
+    <section className="py-20 bg-gray-50" id="partners">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -175,7 +175,7 @@ const Partners = () => {
                 <div className="w-24 h-24 mb-4 rounded flex items-center justify-center overflow-hidden">
                   <img src={partner.logo} alt={`${partner.name} logo`} className="max-w-full max-h-full object-contain" />
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-ghana-primary-600 transition-colors duration-300">
                   {partner.name}
                 </h4>
                 <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full border mb-3 ${getCategoryColor(partner.category)}`}>
@@ -189,7 +189,7 @@ const Partners = () => {
                     href={partner.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200 group-hover:translate-x-1 transform transition-transform duration-200"
+                    className="inline-flex items-center text-ghana-primary-600 hover:text-ghana-primary-700 text-sm font-medium transition-colors duration-200 group-hover:translate-x-1 transform transition-transform duration-200"
                   >
                     Visit Website
                     <ExternalLink className="h-3 w-3 ml-1" />

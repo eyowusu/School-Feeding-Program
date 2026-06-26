@@ -43,14 +43,14 @@ const MissionVision = () => {
   };
 
   return (
-    <section className="py-20 bg-gray-50" id="about">
+    <section className="py-20 bg-white" id="about">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={containerVariants}
-          className="text-center mb-16 bg-yellow-100 rounded-2xl shadow-lg p-8 border border-yellow-300"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             The Ghana School Feeding Programme
@@ -73,22 +73,18 @@ const MissionVision = () => {
               <motion.div
                 key={card.id}
                 variants={cardVariants}
-                whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                className="relative bg-yellow-50 rounded-2xl shadow-lg overflow-hidden group border border-yellow-100"
+                whileHover={{ y: -5, transition: { duration: 0.3 } }}
+                className="bg-white rounded-2xl shadow-lg p-8 group hover:shadow-xl transition-all duration-300 border border-gray-100"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-                <div className="p-8">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br ${card.color} text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">
-                    {card.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed text-lg">
-                    {card.description}
-                  </p>
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-ghana-primary-100 text-ghana-primary-600 mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <IconComponent className="h-8 w-8" />
                 </div>
-                <div className={`h-1 bg-gradient-to-r ${card.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`} />
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-ghana-primary-600 transition-colors duration-300">
+                  {card.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed text-lg">
+                  {card.description}
+                </p>
               </motion.div>
             );
           })}
@@ -103,19 +99,19 @@ const MissionVision = () => {
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">2M+</div>
+            <div className="text-3xl md:text-4xl font-bold text-ghana-primary-600 mb-2">2M+</div>
             <div className="text-gray-600">Children Fed Daily</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">16</div>
+            <div className="text-3xl md:text-4xl font-bold text-ghana-secondary-600 mb-2">16</div>
             <div className="text-gray-600">Regions Covered</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-yellow-600 mb-2">50K+</div>
+            <div className="text-3xl md:text-4xl font-bold text-ghana-primary-600 mb-2">50K+</div>
             <div className="text-gray-600">Local Jobs Created</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">98%</div>
+            <div className="text-3xl md:text-4xl font-bold text-ghana-secondary-600 mb-2">98%</div>
             <div className="text-gray-600">Attendance Rate</div>
           </div>
         </motion.div>
