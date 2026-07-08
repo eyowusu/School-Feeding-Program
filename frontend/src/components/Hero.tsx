@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Hero = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,13 +12,13 @@ const Hero = memo(() => {
   }, []);
 
   useEffect(() => {
-    if (isAutoPlay && slides.length > 0) {
+    if (slides.length > 0) {
       const timer = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
       }, 10000);
       return () => clearInterval(timer);
     }
-  }, [isAutoPlay, slides.length]);
+  }, [slides.length]);
 
   const fetchHeroContent = () => {
     setLoading(true);
@@ -157,14 +156,6 @@ const Hero = memo(() => {
         className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition-all duration-300 z-20"
       >
         <ChevronRight className="h-6 w-6" />
-      </button>
-
-      {/* Auto-play Control */}
-      <button
-        onClick={() => setIsAutoPlay(!isAutoPlay)}
-        className="absolute bottom-4 right-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition-all duration-300 z-20"
-      >
-        {isAutoPlay ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
       </button>
 
       {/* Slide Indicators */}
