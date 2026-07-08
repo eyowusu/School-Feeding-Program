@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Hero = () => {
+const Hero = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const [slides, setSlides] = useState([]);
@@ -16,12 +16,12 @@ const Hero = () => {
     if (isAutoPlay && slides.length > 0) {
       const timer = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
-      }, 5000);
+      }, 10000);
       return () => clearInterval(timer);
     }
   }, [isAutoPlay, slides.length]);
 
-  const fetchHeroContent = async () => {
+  const fetchHeroContent = () => {
     setLoading(true);
     setSlides([
       {
@@ -55,19 +55,17 @@ const Hero = () => {
     setLoading(false);
   };
 
-  const nextSlide = () => {
-    console.log('Next slide clicked, current:', currentSlide, 'total:', slides.length);
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
+  }, [slides.length]);
 
-  const prevSlide = () => {
-    console.log('Previous slide clicked, current:', currentSlide, 'total:', slides.length);
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  }, [slides.length]);
 
-  const goToSlide = (index) => {
+  const goToSlide = useCallback((index) => {
     setCurrentSlide(index);
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -91,14 +89,14 @@ const Hero = () => {
   }
 
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative h-screen overflow-hidden bg-ghana-primary-900">
       <AnimatePresence>
         <motion.div
           key={currentSlide}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0 }}
           className="relative h-full"
         >
           <div
@@ -183,6 +181,6 @@ const Hero = () => {
       </div>
     </section>
   );
-};
+});
 
 export default Hero;

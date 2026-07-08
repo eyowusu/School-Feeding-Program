@@ -61,8 +61,8 @@ function App() {
       // Set up cache invalidation listener for real-time updates
       const handleCacheInvalidate = (event: CustomEvent) => {
         console.log('Cache invalidated for:', event.detail.collection);
-        // Force re-fetch of updated content
-        window.location.reload();
+        // Cache invalidation handled by component-level re-fetching
+        // Removed page reload to prevent disrupting user experience
       };
 
       window.addEventListener('gsfp-cache-invalidate', handleCacheInvalidate as EventListener);

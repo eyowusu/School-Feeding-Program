@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Pause, Star, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import {
@@ -10,24 +10,112 @@ import {
 } from '../services/firebase';
 import { db } from '../services/firebase';
 
-const Spotlight = () => {
+const fallbackSpotlightItems = [
+  {
+    id: 'fallback-1',
+    title: 'Feeding Over 3 Million Children Daily',
+    description: 'The Ghana School Feeding Programme currently provides nutritious meals to over 3 million school children across all 16 regions of Ghana, improving attendance and academic performance.',
+    image: '/Hero1.jpg',
+    video: '/media/Video4.mp4',
+    category: 'Impact',
+    date: '2025-01-15',
+    location: 'Nationwide',
+    link: '#impact',
+    type: 'achievement'
+  },
+  {
+    id: 'fallback-2',
+    title: 'Empowering Local Farmers',
+    description: 'Through our farm-to-school initiative, we partner with over 50,000 local farmers to source fresh, locally-grown ingredients, boosting rural economies.',
+    image: '/Hero2.jpg',
+    video: '/media/Video5.mp4',
+    category: 'Partnership',
+    date: '2025-01-14',
+    location: 'All Regions',
+    link: '#partners',
+    type: 'achievement'
+  },
+  {
+    id: 'fallback-3',
+    title: 'Creating Jobs for Local Caterers',
+    description: 'Our programme has created employment opportunities for thousands of local caterers and kitchen staff, supporting livelihoods in communities across Ghana.',
+    image: '/Hero4.jpg',
+    video: '/media/Video6.mp4',
+    category: 'Employment',
+    date: '2025-01-13',
+    location: 'Ghana',
+    link: '#programs',
+    type: 'achievement'
+  },
+  {
+    id: 'fallback-4',
+    title: 'Nutrition Education Programs',
+    description: 'Comprehensive nutrition education initiatives teaching children and families about healthy eating habits, food security, and sustainable agricultural practices.',
+    image: '/Hero1.jpg',
+    video: '/media/Video7.mp4',
+    category: 'Education',
+    date: '2025-01-12',
+    location: 'All Regions',
+    link: '#programs',
+    type: 'achievement'
+  },
+  {
+    id: 'fallback-5',
+    title: 'Community Outreach Initiatives',
+    description: 'Extending nutrition support beyond schools through community programs, farmer training workshops, and sustainable agriculture development projects.',
+    image: '/Hero2.jpg',
+    video: '/media/Video8.mp4',
+    category: 'Community',
+    date: '2025-01-11',
+    location: 'Ghana',
+    link: '#programs',
+    type: 'achievement'
+  },
+  {
+    id: 'fallback-6',
+    title: 'School Garden Projects',
+    description: 'Establishing school gardens across the country to teach students about agriculture, nutrition, and environmental stewardship while providing fresh produce.',
+    image: '/Hero4.jpg',
+    video: '/media/Video9.mp4',
+    category: 'Sustainability',
+    date: '2025-01-10',
+    location: 'Nationwide',
+    link: '#programs',
+    type: 'achievement'
+  },
+  {
+    id: 'fallback-7',
+    title: 'Monitoring and Quality Assurance',
+    description: 'Implementing robust monitoring systems to ensure food safety, nutritional standards, and program accountability across all beneficiary schools.',
+    image: '/Hero1.jpg',
+    video: '/media/Video10.mp4',
+    category: 'Quality',
+    date: '2025-01-09',
+    location: 'All Regions',
+    link: '#impact',
+    type: 'achievement'
+  }
+];
+
+const Spotlight = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const [spotlightItems, setSpotlightItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userInteracted, setUserInteracted] = useState(false);
 
   useEffect(() => {
     fetchSpotlightContent();
   }, []);
 
   useEffect(() => {
-    if (isAutoPlay && spotlightItems.length > 0) {
+    if (isAutoPlay && spotlightItems.length > 0 && !userInteracted) {
       const timer = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % spotlightItems.length);
       }, 6000);
       return () => clearInterval(timer);
     }
-  }, [isAutoPlay, spotlightItems.length]);
+  }, [isAutoPlay, spotlightItems.length, userInteracted]);
 
   const fetchSpotlightContent = async () => {
     try {
@@ -61,128 +149,33 @@ const Spotlight = () => {
 
       // If no featured content from Firebase, use fallback content
       if (featuredData.length === 0) {
-        setSpotlightItems([
-          {
-            id: 'fallback-1',
-            title: 'Feeding Over 3 Million Children Daily',
-            description: 'The Ghana School Feeding Programme currently provides nutritious meals to over 3 million school children across all 16 regions of Ghana, improving attendance and academic performance.',
-            image: '/Hero1.jpg',
-            video: '/media/Video4.mp4',
-            category: 'Impact',
-            date: '2025-01-15',
-            location: 'Nationwide',
-            link: '#impact',
-            type: 'achievement'
-          },
-          {
-            id: 'fallback-2',
-            title: 'Empowering Local Farmers',
-            description: 'Through our farm-to-school initiative, we partner with over 50,000 local farmers to source fresh, locally-grown ingredients, boosting rural economies.',
-            image: '/Hero2.jpg',
-            video: '/media/Video5.mp4',
-            category: 'Partnership',
-            date: '2025-01-14',
-            location: 'All Regions',
-            link: '#partners',
-            type: 'achievement'
-          },
-          {
-            id: 'fallback-3',
-            title: 'Creating Jobs for Local Caterers',
-            description: 'Our programme has created employment opportunities for thousands of local caterers and kitchen staff, supporting livelihoods in communities across Ghana.',
-            image: '/Hero4.jpg',
-            video: '/media/Video6.mp4',
-            category: 'Employment',
-            date: '2025-01-13',
-            location: 'Ghana',
-            link: '#programs',
-            type: 'achievement'
-          },
-          {
-            id: 'fallback-4',
-            title: 'Nutrition Education Programs',
-            description: 'Comprehensive nutrition education initiatives teaching children and families about healthy eating habits, food security, and sustainable agricultural practices.',
-            image: '/Hero1.jpg',
-            video: '/media/Video7.mp4',
-            category: 'Education',
-            date: '2025-01-12',
-            location: 'All Regions',
-            link: '#programs',
-            type: 'achievement'
-          },
-          {
-            id: 'fallback-5',
-            title: 'Community Outreach Initiatives',
-            description: 'Extending nutrition support beyond schools through community programs, farmer training workshops, and sustainable agriculture development projects.',
-            image: '/Hero2.jpg',
-            video: '/media/Video8.mp4',
-            category: 'Community',
-            date: '2025-01-11',
-            location: 'Ghana',
-            link: '#programs',
-            type: 'achievement'
-          },
-          {
-            id: 'fallback-6',
-            title: 'School Garden Projects',
-            description: 'Establishing school gardens across the country to teach students about agriculture, nutrition, and environmental stewardship while providing fresh produce.',
-            image: '/Hero4.jpg',
-            video: '/media/Video9.mp4',
-            category: 'Sustainability',
-            date: '2025-01-10',
-            location: 'Nationwide',
-            link: '#programs',
-            type: 'achievement'
-          },
-          {
-            id: 'fallback-7',
-            title: 'Monitoring and Quality Assurance',
-            description: 'Implementing robust monitoring systems to ensure food safety, nutritional standards, and program accountability across all beneficiary schools.',
-            image: '/Hero1.jpg',
-            video: '/media/Video10.mp4',
-            category: 'Quality',
-            date: '2025-01-09',
-            location: 'All Regions',
-            link: '#impact',
-            type: 'achievement'
-          }
-        ]);
+        setSpotlightItems(fallbackSpotlightItems);
       } else {
         setSpotlightItems(featuredData.slice(0, 5)); // Limit to 5 items
       }
     } catch (error) {
       console.error('Error fetching spotlight content:', error);
       // Use fallback content on error
-      setSpotlightItems([
-        {
-          id: 'fallback-1',
-          title: 'Feeding Over 3 Million Children Daily',
-          description: 'The Ghana School Feeding Programme currently provides nutritious meals to over 3 million school children across all 16 regions of Ghana.',
-          image: '/Hero1.jpg',
-          video: '/media/Video4.mp4',
-          category: 'Impact',
-          date: '2025-01-15',
-          location: 'Nationwide',
-          link: '#impact',
-          type: 'achievement'
-        }
-      ]);
+      setSpotlightItems([fallbackSpotlightItems[0]]);
     } finally {
       setLoading(false);
     }
   };
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
+    setUserInteracted(true);
     setCurrentSlide((prev) => (prev + 1) % spotlightItems.length);
-  };
+  }, [spotlightItems.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
+    setUserInteracted(true);
     setCurrentSlide((prev) => (prev - 1 + spotlightItems.length) % spotlightItems.length);
-  };
+  }, [spotlightItems.length]);
 
-  const goToSlide = (index) => {
+  const goToSlide = useCallback((index) => {
+    setUserInteracted(true);
     setCurrentSlide(index);
-  };
+  }, []);
 
   const formatDate = (dateString) => {
     try {
@@ -244,7 +237,7 @@ const Spotlight = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
               className="bg-white rounded-2xl shadow-xl overflow-hidden"
             >
               <div className="grid md:grid-cols-2 gap-0">
@@ -253,11 +246,10 @@ const Spotlight = () => {
                   {spotlightItems[currentSlide].video ? (
                     <video
                       src={spotlightItems[currentSlide].video}
-                      autoPlay
-                      muted
-                      loop
+                      controls
                       playsInline
                       className="w-full h-full object-cover"
+                      onPlay={() => setUserInteracted(true)}
                     />
                   ) : (
                     <img
@@ -356,6 +348,6 @@ const Spotlight = () => {
       </div>
     </section>
   );
-};
+});
 
 export default Spotlight;

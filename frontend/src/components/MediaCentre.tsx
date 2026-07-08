@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Image as ImageIcon, Play, X, ChevronLeft, ChevronRight, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import {
@@ -67,7 +67,7 @@ const categories = [
   }
 ];
 
-const MediaCentre = () => {
+const MediaCentre = memo(() => {
   const [photos, setPhotos] = useState(localPhotos);
   const [videos, setVideos] = useState(localVideos);
   const [loading, setLoading] = useState(false);
@@ -163,7 +163,7 @@ const MediaCentre = () => {
 
   const currentItems = activeTab === 'photos' ? (activeCategory ? filteredPhotos : photos) : videos;
 
-  const openCategoryGallery = (category) => {
+  const openCategoryGallery = useCallback((category) => {
     const filtered = photos.filter(category.filter);
     setFilteredPhotos(filtered);
     setActiveCategory(category.id);
@@ -171,25 +171,25 @@ const MediaCentre = () => {
       setSelectedItem(filtered[0]);
       setLightboxIndex(0);
     }
-  };
+  }, [photos]);
 
-  const closeLightbox = () => {
+  const closeLightbox = useCallback(() => {
     setSelectedItem(null);
     setActiveCategory(null);
-  };
+  }, []);
 
-  const openLightbox = (item, index) => {
+  const openLightbox = useCallback((item, index) => {
     setSelectedItem(item);
     setLightboxIndex(index);
-  };
+  }, []);
 
-  const navigateLightbox = (direction) => {
+  const navigateLightbox = useCallback((direction) => {
     const newIndex = lightboxIndex + direction;
     if (newIndex >= 0 && newIndex < currentItems.length) {
       setLightboxIndex(newIndex);
       setSelectedItem(currentItems[newIndex]);
     }
-  };
+  }, [lightboxIndex, currentItems]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -522,6 +522,6 @@ const MediaCentre = () => {
       </AnimatePresence>
     </section>
   );
-};
+});
 
 export default MediaCentre;
